@@ -10,7 +10,7 @@
 %   Key=> Tuple of nodes (IN/OUT) AND EdgeID
 %   Value=> 'pointer' to the Move that it inherits
 
-clear Nodes NumNodes AllMoves Edges NumEdges;
+clear Nodes NumNodes AllMoves Edges NumEdges; clear global
 global Nodes NumNodes AllMoves Edges NumEdges;
 
 %% Nodes Hash
@@ -26,31 +26,38 @@ NumEdges = 0;
 %% Main Program:
 % Loop through all N introns.
 AllMoves = struct([]); 
-for N = 1:9 % number of introns to consider
+for N = 1:3 % number of introns to consider
    
     %fprintf('Beginning Test of intron %d\n',N)
     %%  Get new moves that this intron introduces
-    NewMoves = addNewMoves(N,size(AllMoves,2));
-    AllMoves = [AllMoves NewMoves];
+    
+    %NewMoves = addNewMoves(N,size(AllMoves,2));
+    NewRecruitMoves = addNewRecruitMoves(N,size(AllMoves,2));
+    AllMoves = [AllMoves NewRecruitMoves];
+    
+    NewSpliceMoves = addNewSpliceMoves(N,size(AllMoves,2));
+    AllMoves = [AllMoves NewSpliceMoves];
+    
+    
     
     %% For each EXISTING node, add these moves, if possible
     
-    % First, record the names in the hash
+    % Get names from hash
     myNodesTempNames = cell(NumNodes,1);
     enum = Nodes.keys();
     count = 0;
     while enum.hasMoreElements   
         count = count+1;
-        ThisNodeName = enum.nextElement;
-        myNodesTempNames{count} = ThisNodeName;
+        myNodesTempNames{count} = enum.nextElement;
     end
     
     % Next, loop through all EXISTING nodes and add their legal moves
+    % This ALSO adds new nodes
     for(i = 1:length(myNodesTempNames))
         ThisNodeName = myNodesTempNames{i};
-        ThisNodeID = Nodes.get(ThisNodeName);
+        %ThisNodeID = Nodes.get(ThisNodeName);
         %fprintf('Testing nodes afresh\n')
-        TestMovesOnOneNode(ThisNodeName,NewMoves)
+        TestMovesOnOneNode(ThisNodeName,[ NewRecruitMoves NewSpliceMoves])
     end
     
     %% Make S matrix: sparse Matrix notation
@@ -87,15 +94,15 @@ for N = 1:9 % number of introns to consider
 %     % FluxByNode = (Node_Concentraions.*VnodeMultiplier); 
     % Flux = FluxByNode(VnodeIndex);
         
-    save(sprintf('AltSplicingMatrices%2d.mat',N), 'Nodes', 'NumNodes', 'AllMoves', 'Edges', 'NumEdges','S','VnodeIndex','VmoveIndex');
+    save(sprintf('AltSpliceRecruitMatrices%2d.mat',N), 'Nodes', 'NumNodes', 'AllMoves', 'Edges', 'NumEdges','S','VnodeIndex','VmoveIndex');
 
 end
 
 %% Save data together
 clear spliceGraph;
-for  N =1:9
+for  N =1:3
     disp(N)
-    load(sprintf('AltSplicingMatrices%2d.mat',N))
+    load(sprintf('AltSpliceRecruitMatrices%2d.mat',N))
 
     % Reverse the hash: map node ID's to node keys:
     NodesTable = cell(NumNodes,1);
@@ -112,7 +119,7 @@ for  N =1:9
     spliceGraph(N).TranscriptNames = multiple_nodesToTranscript(NodesTable,spliceGraph(N));
       
 end
-save('AltSplicing_1-9_structures.mat','spliceGraph');
+save(sprintf('AltSplicingRecruit_1-%d_structures.mat',N),'spliceGraph');
 
 
 %% Report number of edges:
