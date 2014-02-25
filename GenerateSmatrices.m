@@ -33,32 +33,47 @@ for N = 1:3 % number of introns to consider
     
     %NewMoves = addNewMoves(N,size(AllMoves,2));
     NewRecruitMoves = addNewRecruitMoves(N,size(AllMoves,2));
-    AllMoves = [AllMoves NewRecruitMoves];
     
-    NewSpliceMoves = addNewSpliceMoves(N,size(AllMoves,2));
-    AllMoves = [AllMoves NewSpliceMoves];
+    NewSpliceMoves = addNewSpliceMoves(N,size(AllMoves,2)+2);
+   
+    %AllMoves = [AllMoves NewRecruitMoves NewSpliceMoves];
     
     
     
     %% For each EXISTING node, add these moves, if possible
     
-    % Get names from hash
-    myNodesTempNames = cell(NumNodes,1);
-    enum = Nodes.keys();
-    count = 0;
-    while enum.hasMoreElements   
-        count = count+1;
-        myNodesTempNames{count} = enum.nextElement;
+    % Split the moves up into 2 phases: 5' recruit, then 3'+splicing
+    movePhases = {NewRecruitMoves(1), [NewRecruitMoves(2) NewSpliceMoves]};
+    
+    for p = 1:2
+        
+        sprintf('Intron %d phase %d',N,p)
+        phase = movePhases{p};
+        AllMoves = [AllMoves phase];
+        
+        % Get names from hash
+        myNodesTempNames = cell(NumNodes,1);
+        enum = Nodes.keys();
+        count = 0;
+        while enum.hasMoreElements
+            count = count+1;
+            myNodesTempNames{count} = enum.nextElement;
+        end
+        
+        % Next, loop through all EXISTING nodes and add their legal moves
+        % This ALSO adds new nodes
+        for(i = 1:length(myNodesTempNames))
+            ThisNodeName = myNodesTempNames{i};
+            %ThisNodeID = Nodes.get(ThisNodeName);
+            %fprintf('Testing nodes afresh\n')
+            TestMovesOnOneNode(ThisNodeName,phase)
+        end
     end
     
-    % Next, loop through all EXISTING nodes and add their legal moves
-    % This ALSO adds new nodes
-    for(i = 1:length(myNodesTempNames))
-        ThisNodeName = myNodesTempNames{i};
-        %ThisNodeID = Nodes.get(ThisNodeName);
-        %fprintf('Testing nodes afresh\n')
-        TestMovesOnOneNode(ThisNodeName,[ NewRecruitMoves NewSpliceMoves])
-    end
+    
+    
+    
+    
     
     %% Make S matrix: sparse Matrix notation
     % in S, rows are reactants (nodes), columns are reactions/fluxes (edges)
@@ -105,13 +120,12 @@ for  N =1:3
     load(sprintf('AltSpliceRecruitMatrices%2d.mat',N))
 
     % Reverse the hash: map node ID's to node keys:
+    %a=arrayfun(@(x)x,Nodes.values.toArray);
     NodesTable = cell(NumNodes,1);
     enum = Nodes.keys();
-    count = 0;
     while enum.hasMoreElements   % Loop through all EXISTING nodes
         key = enum.nextElement;
         NodesTable{Nodes.get(key)} = key;
-        count = count + 1;
     end
     
     % Final Save

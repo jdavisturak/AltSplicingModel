@@ -11,7 +11,7 @@ function allowed = isMoveAllowed(newMove,previousMoves)
     
     froms = [previousMoves.from];
     tos   = [previousMoves.to];
-    recruits   = [previousMoves.recruit]
+    recruits   = [previousMoves.recruit];
     
         
      
@@ -44,7 +44,8 @@ function allowed = isMoveAllowed(newMove,previousMoves)
         test4 = newMove.from == froms & recruits=='5';
         test5 = newMove.to == froms & recruits=='3';
         
-        allowed = any(test4) & any(test5) & ~( any(test1)  | any(test2) | any(test3));
+        allowed = any(test4) & any(test5) & ~( any(test1)  | any(test2) | any(test3));        
+        %tests=[test1; test2; test3;test4; test5]
     end
 end
 

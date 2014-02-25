@@ -13,6 +13,7 @@ for (moveIndex = 1:length(NewMoves))
     
     % Is this move legal?
     if isMoveAllowed(thisMove,previousMoves)
+        
         % If allowed, construct the string of a new node, otherwise skip
         targetNodeName = addToNodeName(ThisNodeName,thisMove);
         targetNode = Nodes.get(targetNodeName);        % Retrieve this node from the hashtable
@@ -36,7 +37,8 @@ for (moveIndex = 1:length(NewMoves))
             %disp(Edges);                        
             
             % test this NEW node, with all OTHER moves!
-            otherMovesIndex = ~ismember([AllMoves.index],keyToMoves(targetNodeName));             
+            otherMovesIndex = ~ismember([AllMoves.index],keyToMoves(targetNodeName));  
+            %sprintf('Testing new moves on node %s: ',targetNodeName)
             TestMovesOnOneNode(targetNodeName,AllMoves(otherMovesIndex));
             
             
