@@ -1,6 +1,6 @@
 function Q_T = SimulateMarkov(Q,T)
 
-[V D] = eig(Q);
+[V, D] = eig(Q);
 
 D2 = diag(exp(diag(D)*T));
 
