@@ -43,5 +43,27 @@ toc
 
 % For N = 9:
 % 125 seconds
-% 
-   
+%
+
+
+clear
+load('AltSplicing_1-9_structures.mat'); % load spliceGraph
+N=2;
+global K SG;
+
+SG = spliceGraph(N);
+syms k1 k2 k3 t1 t2 t3
+times = [ t1 t2 t3];
+K = [k1 k2 k3]
+TranscriptNames = SG.TranscriptNames;
+whichCompleteSplicers = completeSplicers(SG)
+
+
+startConc = [1 zeros(1,spliceGraph(N).NumNodes-1)];
+
+% Method 1: analytical solution with Q matrix
+Q = makeQMatrixFromS_symbolic(SG.S,SG.VmoveIndex,length(SG.Moves))    
+Q_T = SimulateMarkov(Q,t1)
+
+
+

@@ -7,7 +7,7 @@ function [Q2] = makeQMatrixFromS_symbolic(S,VmoveIndex,numMoves)
 nNodes = size(S,1);
 nEdges = size(S,2);
 
-syms = createSymData(numMoves);
+syms = createSymData(numMoves,'k');
 
 % First make off-diagonal entries
 Q2=sym(zeros(nNodes));

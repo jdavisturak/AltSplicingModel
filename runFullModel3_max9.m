@@ -3,7 +3,7 @@
 % Here I'm going to splice the last step POST-transriptionally ONLY,
 % thereby only doing the eigenvector computation once. 
 
-function [FinalConcentration,OutputTimes,OutputX , FinalConcentration2,OutputTimes2,OutputX2, TranscriptNames,whichCompleteSplicers ]=runFullModel2_max9(gene,NetElong,k_s_vec,options,verbose)
+function [FinalConcentration,OutputTimes,OutputX , FinalConcentration2,OutputTimes2,OutputX2, TranscriptNames,whichCompleteSplicers ]=runFullModel3_max9(gene,NetElong,k_s_vec,options,verbose)
 MAX_INTRONS = 9;
 
 global GLOBAL_spliceGraph;

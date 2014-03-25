@@ -175,8 +175,8 @@ subplot(1,3,3);plot(CTS_times     ,  CTS_v2_Regions); legend(regions);
 % Show CTS has more high-fidelity splicing
 clear
 load('AltSplicing_1-9_structures.mat'); % load spliceGraph
-N=5;
-times = ones(1,N)  / 3;
+N=2;
+times = [1/3 1000 1000] %ones(1,N)  / 3; only the first time matters ...
 TranscriptNames = spliceGraph(N).TranscriptNames;
 whichCompleteSplicers = completeSplicers(spliceGraph(N))
 
@@ -187,8 +187,28 @@ K = ones(N*(N+1)/2,1);
 FinalCTS(whichCompleteSplicers(1));
 
 [FinalPTS OutputTimes_PTS2 OutputX_PTS2] = SpliceAllPostTxn([1 zeros(1,spliceGraph(N).NumNodes-1)],spliceGraph(N),times(1),K);
-[FinalPTS(whichCompleteSplicers(1));
-FinalCTS(whichCompleteSplicers(1))]
+[FinalPTS(whichCompleteSplicers(1:2));
+FinalCTS(whichCompleteSplicers(1:2))]
+
+%    exclude   include
+%    0.3333    0.6667  # PTS only
+%    0.2388    0.7612  # CTS + PTS
+
+
+K = [2 1 1/10]'; 
+[FinalConcentration,OutputTimes,OutputX] = SpliceDuringTxn(N,times,K,spliceGraph);
+[FinalCTS OutputTimes_PTS1 OutputX_PTS1] = SpliceAllPostTxn(FinalConcentration,spliceGraph(N),times(1),K);
+FinalCTS(whichCompleteSplicers(1));
+
+[FinalPTS OutputTimes_PTS2 OutputX_PTS2] = SpliceAllPostTxn([1 zeros(1,spliceGraph(N).NumNodes-1)],spliceGraph(N),times(1),K);
+[FinalPTS(whichCompleteSplicers(1:2));
+FinalCTS(whichCompleteSplicers(1:2))]
+
+%    0.3226    0.6774
+%     0.1656    0.8344
+
+% [FinalConcentration,OutputTimes,OutputX , FinalConcentration2,OutputTimes2,OutputX2, TranscriptNames,whichCompleteSplicers ] = ...
+%             runFullModel3_max9(gene,NetElong,repmat(Ks,1,length(gene.introns)*(length(gene.introns)+1)/2));
 
 
 
