@@ -3,18 +3,8 @@
 
 function total_elongation=calculateElongationMeans2(gene,NetElong)
 
-%% Calculate Time for each region
-% Separate the regions of the gene into N1, N2, ... The beginning/end of a region is the end of the intron
-regionStarts = gene.exonStarts(2:end);
-regionEnds   = [regionStarts(2:end)-1 gene.exonEnds(end)];
-numRegions = length(regionStarts);
+% Regions start at the first intron
+total_elongation = ([gene.introns(2:end) 0] + gene.exons(2:end)) ./ NetElong;
 
-total_elongation = zeros(1,numRegions);
-
-% Loop through each region
-for (i = 1:(numRegions))
-    total_elongation(i) = abs(regionStarts(i) - regionEnds(i) + 1) / NetElong;
-    
-end
 
 end

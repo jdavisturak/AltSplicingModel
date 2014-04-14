@@ -1,4 +1,4 @@
-function [FinalConcentration,OutputTimes,OutputX] = SpliceDuringTxn(NumIntrons,Times,Ks,spliceGraph)
+function [FinalConcentration,OutputTimes,OutputX, Q] = SpliceDuringTxn(NumIntrons,Times,Ks,spliceGraph, verbose)
 % This function runs the ODE solver for the specified times,  which are calculated indepently.
 % UPDATE: Now solve 'analyztically' using matrix exponentiation 
 
@@ -6,6 +6,12 @@ if NumIntrons > length(spliceGraph)
     fprintf('Sorry, not implemented for more than %d introns!',length(spliceGraph));
     return;
 end
+
+
+if (nargin < 5)
+    verbose = true;
+end
+
 
 global K SG;
 
@@ -18,7 +24,9 @@ OutputX = {};
 for( N =1:NumIntrons)
     SG = spliceGraph(N);
     
-    fprintf('Intron %d.  ', N);    tic
+    if verbose
+        fprintf('Intron %d.  ', N);    tic
+    end
     
     % Add new empty nodes
     StartingConcentration = [StartingConcentration zeros(1,size(SG.S,1)-length(StartingConcentration))];

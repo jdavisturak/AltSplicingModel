@@ -3,7 +3,7 @@
 % Here I'm going to splice the last step POST-transriptionally ONLY,
 % thereby only doing the eigenvector computation once. 
 
-function [FinalConcentration,OutputTimes,OutputX , FinalConcentration2,OutputTimes2,OutputX2, TranscriptNames,whichCompleteSplicers ]=runFullModel3_max9(gene,NetElong,k_s_vec,options,verbose)
+function [FinalConcentration,OutputTimes,OutputX , FinalConcentration2,OutputTimes2,OutputX2, TranscriptNames,whichCompleteSplicers, FinalQ ]=runFullModel3_max9(gene,NetElong,k_s_vec,options,verbose)
 MAX_INTRONS = 9;
 
 global GLOBAL_spliceGraph;
@@ -12,7 +12,7 @@ if isempty(GLOBAL_spliceGraph)
     GLOBAL_spliceGraph = spliceGraph;
 end
 
-if (nargin < 7)
+if (nargin < 5)
     verbose = true;
 end
 
@@ -22,7 +22,7 @@ end
 %     maxTranscripts = options.maxTranscripts;
 % end
 
-NumIntrons=length(gene.introns);
+NumIntrons=gene.NumIntrons;
 if NumIntrons > MAX_INTRONS
     error('Too many introns! Max allowed is %d introns\n',MAX_INTRONS);
 end
@@ -42,15 +42,15 @@ region_elongation_times = calculateElongationMeans2(gene,NetElong);
 k_s_vec = reshape(k_s_vec,numel(k_s_vec),1);
 
 % 1) Co-transcriptional splicing
-% Only do up to introns N-1
-[FinalConcentration,OutputTimes,OutputX] = SpliceDuringTxn(NumIntrons-1,region_elongation_times,k_s_vec,GLOBAL_spliceGraph);
+% Only do up to introns N
+[FinalConcentration,OutputTimes,OutputX, Q] = SpliceDuringTxn(NumIntrons,region_elongation_times,k_s_vec,GLOBAL_spliceGraph, verbose);
 
-if(NumIntrons > 1)
-    FinalConcentration = [FinalConcentration zeros(1,size(GLOBAL_spliceGraph(NumIntrons).S,1)-length(FinalConcentration))];
-end
+% if(NumIntrons > 1)
+%     FinalConcentration = [FinalConcentration zeros(1,size(GLOBAL_spliceGraph(NumIntrons).S,1)-length(FinalConcentration))];
+% end
 
 % 2) Post-transcriptional splicing
-[FinalConcentration2,OutputTimes2,OutputX2] = SpliceAllPostTxn(FinalConcentration,GLOBAL_spliceGraph(NumIntrons),region_elongation_times(end),k_s_vec);
+[FinalConcentration2,OutputTimes2,OutputX2, FinalQ] = SpliceAllPostTxn(FinalConcentration,GLOBAL_spliceGraph(NumIntrons),region_elongation_times(end),k_s_vec, 0.001,verbose,Q);
 
 
 
